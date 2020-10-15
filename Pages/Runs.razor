@@ -1,0 +1,52 @@
+﻿@page "/runs";
+@using BangTestDemo2.Data;
+@using BangTestDemo2.Data.Models;
+@inject SqlDbContext context;
+
+<h3>Runs</h3>
+
+<table>
+    <thead>
+        <tr>
+            <td>Run Id</td>
+            <td>Base Package</td>
+            <td>Comparison Package</td>
+            <td>Cabset</td>
+            <td>Submission Time</td>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (Run r in RunList)
+            {
+                <tr>
+                    <td><a href="/runs/@r.RunId">@r.RunId</a></td>
+                    <td>@r.BasePackageName</td>
+                    <td>@r.ComparisonPackageName</td>
+                    <td>@r.CabsetName</td>
+                    <td>@r.SubmissionTime</td>
+                </tr>
+            }
+        <tr>
+        </tr>
+    </tbody>
+</table>
+
+
+
+@code {
+    private List<Run> RunList;
+    private bool ShowBody;
+
+    protected override async Task OnInitializedAsync()
+    {
+        RunList = new List<Run>();
+        ShowBody = false;
+        var runs = await context.GetTop100RunsAsync();
+        if(runs != null)
+        {
+            RunList = runs;
+        }
+        ShowBody = true;
+    }
+
+}

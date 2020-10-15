@@ -1,0 +1,62 @@
+﻿@page "/newrun";
+@using BangTestDemo2.Data;
+@using BangTestDemo2.Data.Models;
+@inject SqlDbContext context;
+
+<h3>NewRun</h3>
+
+<EditForm Model="@newRun" OnSubmit="@SubmitNewRun">
+    <table>
+        <thead>
+            <tr>
+                <td>Base Package</td>
+                <td>Comparison Package</td>
+                <td>Cab Set</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <InputText id="basePackage" @bind-Value="newRun.BasePackageName" />
+                </td>
+                <td>
+                    <InputText id="newPackage" @bind-Value="newRun.ComparisonPackageName" />
+                </td>
+                <td>
+                    <InputText id="cabset" @bind-Value="newRun.CabsetName" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private Data.Models.Run newRun;
+
+    protected override async Task OnInitializedAsync()
+    {
+        newRun = new Data.Models.Run();
+    }
+
+    private async Task SubmitNewRun()
+    {
+        if (!string.IsNullOrEmpty(newRun.BasePackageName) && !string.IsNullOrEmpty(newRun.ComparisonPackageName) && !string.IsNullOrEmpty(newRun.CabsetName))
+        {
+            newRun.BasePackageId = await context.GetPackageIdByName(newRun.BasePackageName);
+            newRun.ComparisonPackageId = await context.GetPackageIdByName(newRun.ComparisonPackageName);
+            newRun.SubmissionTime = DateTime.UtcNow;
+            newRun.CabsetId = await context.GetCabsetIdByName(newRun.CabsetName);
+            newRun.TotalCabCount = await context.GetCabsetCount(newRun.CabsetName);
+            newRun.IsCompleted = false;
+            newRun.CabsCompleted = 0;
+
+            var result = await context.AddNewRun(newRun);
+            if(result)
+            {
+                newRun = new Run();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+}

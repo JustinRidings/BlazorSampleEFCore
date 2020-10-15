@@ -1,0 +1,146 @@
+﻿@*@page "/runs/{PackageId:int}";
+@using BangTestDemo2.Data;
+@using BangTestDemo2.Data.Models;
+@inject SqlDbContext context;
+
+<h3>RunEvaluation</h3>
+
+@if (shouldRenderRun)
+{
+    <table>
+        <thead>
+            <tr>
+                <td>RunId</td>
+                <td>Base Package ID</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@currentRun.BasePackageName</td>
+                <td>@currentRun.ComparisonPackageName</td>
+                <td>@currentRun.CabsetName</td>
+                <td>@currentRun.TotalCabCount</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@if (shouldRenderCabs)
+{
+    <br />
+    <table>
+        <thead>
+            <tr>
+                <td>Cab Count</td>
+                <td>Cab Types</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@runCabset.CabCount</td>
+                <td>@runCabset.CabTypes</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+}
+
+@if (shouldRenderBasePackage)
+{
+    <table>
+        <thead>
+            <tr>
+                <td>Base Package Name</td>
+                <td>Base Package ID</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@basePackage.PackageName</td>
+                <td>@basePackage.PackageId</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+}
+
+@if (shouldRenderCompPackage)
+{
+    <table>
+        <thead>
+            <tr>
+                <td>Comparison Package Name</td>
+                <td>Comparison Package ID</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@comparisonPackage.PackageName</td>
+                <td>@comparisonPackage.PackageId</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [Parameter]
+    public int RunId { get; set; }
+
+    public Run currentRun { get; set; }
+    public CabSet runCabset { get; set; }
+    public Package basePackage { get; set; }
+    public Package comparisonPackage { get; set; }
+    public bool shouldRenderRun = false;
+    public bool shouldRenderCabs = false;
+    public bool shouldRenderBasePackage = false;
+    public bool shouldRenderCompPackage = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PopulateRun();
+        if (currentRun != null)
+        {
+            shouldRenderRun = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        await PopulateCabset();
+        if (runCabset != null)
+        {
+            shouldRenderCabs = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        await PopulateBasePackage();
+        if (basePackage != null)
+        {
+            shouldRenderBasePackage = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        await PopulateComparisonPackage();
+        if (comparisonPackage != null)
+        {
+            shouldRenderCompPackage = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public async Task PopulateRun()
+    {
+        currentRun = await context.GetRunById(RunId);
+    }
+
+    public async Task PopulateCabset()
+    {
+        runCabset = await context.GetCabsetById(currentRun.CabsetId);
+    }
+
+    public async Task PopulateBasePackage()
+    {
+        basePackage = await context.GetPackageById(currentRun.BasePackageId);
+    }
+
+    public async Task PopulateComparisonPackage()
+    {
+        comparisonPackage = await context.GetPackageById(currentRun.ComparisonPackageId);
+    }
+}*@

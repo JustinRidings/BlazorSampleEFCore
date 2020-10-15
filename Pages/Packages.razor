@@ -1,0 +1,26 @@
+﻿@page "/newpackage";
+@using BangTestDemo2.Data;
+@using BangTestDemo2.Data.Models;
+@inject SqlDbContext context;
+
+<h3>Create a new package</h3>
+<EditForm Model="@newPackage" OnSubmit="@SubmitPackage">
+    <label>Package Name</label>
+    <InputText @bind-Value="newPackage.PackageName" />
+    <label>Package Location</label>
+    <InputText @bind-Value="newPackage.PackageLocation" />
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    Package newPackage = new Package();
+
+    public async Task SubmitPackage()
+    {
+        newPackage.CreationDate = DateTime.UtcNow;
+        newPackage.IsReleased = false;
+        await context.AddNewPackage(newPackage);
+        newPackage = new Package();
+        await InvokeAsync(StateHasChanged);
+    }
+}

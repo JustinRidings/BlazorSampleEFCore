@@ -1,0 +1,54 @@
+﻿@page "/newcabset";
+@using BangTestDemo2.Data;
+@using BangTestDemo2.Data.Models;
+@using System.Diagnostics;
+ 
+@inject SqlDbContext context;
+
+<h3>Create a new package</h3>
+
+<EditForm Model="@newCabset" OnSubmit="@SubmitCabset">
+    <label>Cabset Name</label>
+    <InputText @bind-Value="newCabset.CabsetName" />
+    <button type="submit">Submit</button>
+</EditForm>
+
+@if(IsSuccess)
+{
+    <h2>Successfully registered cabset @NewCabsetId! Page will refresh in 5 seconds</h2>
+}
+
+@code {
+    Data.Models.CabSet newCabset;
+    private bool IsSuccess;
+    private Stopwatch s;
+    private int NewCabsetId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        newCabset = new Data.Models.CabSet();
+        IsSuccess = false;
+        s = new Stopwatch();
+    }
+
+    public async Task SubmitCabset()
+    {
+        newCabset.CabConfigLocation = "foo";
+        newCabset.CabCount = 1;
+        newCabset.CabTypes = "Usermode";
+        newCabset.CreatedDate = DateTime.UtcNow;
+        await context.AddNewCabset(newCabset);
+        NewCabsetId = newCabset.CabsetId;
+        this.StateHasChanged();
+
+        s.Start();
+
+        while(s.ElapsedMilliseconds <= 5000)
+        {
+
+        }
+
+        await this.OnInitializedAsync();
+
+    }
+}
