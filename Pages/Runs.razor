@@ -16,9 +16,11 @@
         </tr>
     </thead>
     <tbody>
+        @* Simple for-each of our Run-List :) *@
             @foreach (Run r in RunList)
             {
                 <tr>
+                    @* Display the RunId, while also providing it as a link to Drill-Into run-details *@
                     <td><a href="/runs/@r.RunId">@r.RunId</a></td>
                     <td>@r.BasePackageName</td>
                     <td>@r.ComparisonPackageName</td>
@@ -35,17 +37,23 @@
 
 @code {
     private List<Run> RunList;
+
+    // UI Variable
     private bool ShowBody;
 
     protected override async Task OnInitializedAsync()
     {
         RunList = new List<Run>();
+
         ShowBody = false;
+
         var runs = await context.GetTop100RunsAsync();
+
         if(runs != null)
         {
             RunList = runs;
         }
+
         ShowBody = true;
     }
 

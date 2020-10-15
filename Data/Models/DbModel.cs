@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations; // Dont forget to import
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema; // Dont forget to import
 
 namespace BangTestDemo2.Data.Models
 {
+    // Important note, The classes below do not include constructors,
+    // however you can include them
+
+    // Additionally, any changes to the below classes would require you to Add-Migration from the
+    // Package Manager console. After successfully Adding a Migration, you would then use the 
+    // Update-Database command from the PackageManager console. 
+
     public class Package
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

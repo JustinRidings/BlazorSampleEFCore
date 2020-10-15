@@ -28,9 +28,15 @@ namespace BangTestDemo2
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            // Project template code, for creating a singleton service based on static data or something
             services.AddSingleton<WeatherForecastService>();
+
+            // Instantiate our DBContext as a Service :) 
             services.AddEntityFrameworkSqlServer();
             services.AddDbContext<SqlDbContext>();
+
+            // Traditionally this is also where you would set up your AAD Auth, any HTTP Clients, etc.
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

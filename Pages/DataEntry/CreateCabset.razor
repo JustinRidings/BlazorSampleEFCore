@@ -2,10 +2,13 @@
 @using BangTestDemo2.Data;
 @using BangTestDemo2.Data.Models;
 @using System.Diagnostics;
- 
+
 @inject SqlDbContext context;
 
 <h3>Create a new package</h3>
+
+@* https://blazor-university.com/forms/ *@
+@* Bind form to newCabset variable that we populate from input and use to update DB *@
 
 <EditForm Model="@newCabset" OnSubmit="@SubmitCabset">
     <label>Cabset Name</label>
@@ -13,12 +16,13 @@
     <button type="submit">Submit</button>
 </EditForm>
 
-@if(IsSuccess)
+@if (IsSuccess)
 {
     <h2>Successfully registered cabset @NewCabsetId! Page will refresh in 5 seconds</h2>
 }
 
 @code {
+    // weird naming reference issue requires reference to data.models.cabset
     Data.Models.CabSet newCabset;
     private bool IsSuccess;
     private Stopwatch s;
@@ -33,21 +37,29 @@
 
     public async Task SubmitCabset()
     {
+        // Initialize some sample data for demo purposes
         newCabset.CabConfigLocation = "foo";
         newCabset.CabCount = 1;
         newCabset.CabTypes = "Usermode";
         newCabset.CreatedDate = DateTime.UtcNow;
         await context.AddNewCabset(newCabset);
+
+        // UI Variable
         NewCabsetId = newCabset.CabsetId;
+
+        //notify of state change for refresh
         this.StateHasChanged();
 
+        //start our stopwatch
         s.Start();
 
-        while(s.ElapsedMilliseconds <= 5000)
+        // Fun little 5 second wait [that doesnt work properly in UI :( ]
+        while (s.ElapsedMilliseconds <= 5000)
         {
-
+            //no-op
         }
 
+        // Refresh page to re-instantiate veriables and clear form
         await this.OnInitializedAsync();
 
     }

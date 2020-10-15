@@ -1,7 +1,9 @@
 ﻿@page "/runs/{RunId:int}";
+@* https://docs.microsoft.com/en-us/aspnet/core/blazor/fundamentals/routing?view=aspnetcore-3.1 *@
 @using BangTestDemo2.Data;
 @using BangTestDemo2.Data.Models;
 @inject SqlDbContext context;
+@* inject is called above so that we use our DB Context that is initialized when the WebApp is initialized *@
 
 <h3>RunEvaluation</h3>
 
@@ -109,25 +111,51 @@
 }
 
 @code {
+    // Use RunId as parameter on-load from route
 
     [Parameter]
     public int RunId { get; set; }
+
+    // Initialize page object properties
 
     public Run currentRun { get; set; }
     public CabSet runCabset { get; set; }
     public Package basePackage { get; set; }
     public Package comparisonPackage { get; set; }
+
+    // UI Booleans to avoid ObjectNotInitialized exceptions
+    // on page-load
+
     public bool shouldRenderRun = false;
     public bool shouldRenderCabs = false;
     public bool shouldRenderBasePackage = false;
     public bool shouldRenderCompPackage = false;
 
+
+    // To-Do: Investigate Task.WhenAll() as implementation
+    // for DB tasks. Parallelism is great :)
     protected override async Task OnInitializedAsync()
     {
+        // Populate the Run first, as other
+        // data is centered around it
+
         await PopulateRun();
+
+        // Assuming we populate the run,
+        // flip the UI boolean and notify
+        // of StateChanged for page refresh
+
         if (currentRun != null)
         {
             shouldRenderRun = true;
+
+            // This is a 'tribal knowledge' implementation
+            // of calling the this.StateHasChanged() method.
+            // We invoke so that the current thread calls
+            // the method, instead of launching a seperate
+            // task on a seperate thread, that has to wait
+            // for an object lock to release
+
             await InvokeAsync(StateHasChanged);
         }
         await PopulateCabset();
